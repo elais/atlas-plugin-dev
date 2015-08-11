@@ -1,0 +1,45 @@
+﻿{
+  "key": "connect-workflow-example",
+  "name": "Connect workflow",
+  "description": "Example workflow post function add-on",
+  "vendor": {
+    "name": "Atlassian",
+    "url": "https://connect.atlassian.com"
+  },
+  "baseUrl": "{{localBaseUrl}}",
+  "links": {
+    "self": "{{localBaseUrl}}/atlassian-connect.json",
+    "homepage": "{{localBaseUrl}}/atlassian-connect.json"
+  },
+  "authentication": {
+    "type": "jwt"
+  },
+  "lifecycle": {
+    "installed": "/installed"
+  },
+  "modules": {
+    "jiraWorkflowPostFunctions": [
+      {
+        "key": "wf-pf-test",
+        "create": {
+          "url": "/create"
+        },
+        "description": {
+          "value": "This post function clones the issue to releases further down the stream."
+        },
+        "edit": {
+          "url": "/edit?id={postFunction.id}"
+        },
+        "name": {
+          "value": "My function example"
+        },
+        "triggered": {
+          "url": "/triggered"
+        },
+        "view": {
+          "url": "/view?id={postFunction.id}"
+        }
+      }
+    ]
+  }
+}

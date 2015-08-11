@@ -1,35 +1,77 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using System.Dynamic;
+using System.Web;
+using Atlassian.Connect;
+using Atlassian.Connect.Jwt;
 
 namespace atlas_connect.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        [HttpPost]
+        public ActionResult InstalledCallback()
         {
-            return View();
+            SecretKeyPersister.SaveSecretKey(Request);
+
+            return Content(String.Empty);
         }
 
-        public IActionResult About()
+        [JwtAuthentication]
+        public ActionResult Index()
         {
-            ViewData["Message"] = "Your application description page.";
+            var client = Request.CreateConnectHttpClient("com.example.myaddon");
 
-            return View();
+            var response = client.GetAsync("rest/api/latest/project").Result;
+            var results = response.Content.ReadAsStringAsync().Result;
+
+            dynamic model = new ExpandoObject();
+            model.projects = results;
+            return View(model);
         }
 
-        public IActionResult Contact()
+        [HttpGet]
+        public ActionResult Descriptor()
         {
-            ViewData["Message"] = "Your contact page.";
+            var descriptor = new ConnectDescriptor()
+            {
+                name = "Hello World",
+                description = "Atlassian Connect add-on",
+                key = "com.example.myaddon",
+                vendor = new ConnectDescriptorVendor()
+                {
+                    name = "Example, Inc.",
+                    url = "http://example.com"
+                },
+                authentication = new
+                {
+                    type = "jwt"
+                },
+                lifecycle = new
+                {
+                    installed = "/installed"
+                },
+                modules = new
+                {
+                    generalPages = new[]
+                    {
+                        new
+                        {
+                            url = "/helloworld.html",
+                            key = "hello-world",
+                            location = "system.top.navigation.bar",
+                            name = new
+                            {
+                                value = "Greeting"
+                            }
+                        }
+                    }
+                }
+            };
 
-            return View();
-        }
+            descriptor.SetBaseUrlFromRequest(Request);
+            descriptor.scopes.Add("READ");
 
-        public IActionResult Error()
-        {
-            return View("~/Views/Shared/Error.cshtml");
+            return Json(descriptor, JsonRequestBehavior.AllowGet);
         }
     }
 }
