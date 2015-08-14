@@ -6,13 +6,13 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box='subutai/atlas-dev'
+  config.vm.box='atlassiandev/connect'
 
   # VM provision
-  config.vm.provision :shell, path: "bootstrap.sh"
+  # config.vm.provision :shell, path: "bootstrap.sh"
 
   config.vm.network "forwarded_port", guest: 3000, host: 3000
-  config.vm.network "forwarded_port", guest: 8000, host: 8000
+  config.vm.network "forwarded_port", guest: 8000, host: 8080
   config.vm.network "forwarded_port", guest: 2990, host: 2990
   config.vm.network "forwarded_port", guest: 1990, host: 1990
 
